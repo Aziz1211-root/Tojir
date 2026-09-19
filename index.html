@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tojir App</title>
+    <!-- 1. Подключаем официальный JS SDK Telegram -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body {
+            /* Переменные var(--tg-theme-...) берутся автоматически из темы Telegram пользователя */
+            background-color: var(--tg-theme-bg-color, #ffffff);
+            color: var(--tg-theme-text-color, #000000);
+            font-family: sans-serif;
+            text-align: center;
+            padding: 20px;
+            margin: 0;
+        }
+        h1 {
+            font-size: 24px;
+        }
+        .btn {
+            background-color: var(--tg-theme-button-color, #2481cc);
+            color: var(--tg-theme-button-text-color, #ffffff);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 20px;
+            width: 80%;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Привет, <span id="user-name">Гость</span>!</h1>
+    <p>Это пример простого Telegram Mini App.</p>
+    
+    <button class="btn" id="send-data-btn">Отправить данные в бот</button>
+
+    <script>
+        // Инициализируем Telegram WebApp
+        const tg = window.Telegram.WebApp;
+        tg.ready(); // Сообщаем Telegram, что приложение готово к отрисовке
+        tg.expand(); // Расширяем приложение на весь экран телефона
+
+        // Достаем имя пользователя из Telegram
+        if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+            const user = tg.initDataUnsafe.user;
+            document.getElementById('user-name').innerText = user.first_name;
+        }
+
+        // Обработка клика по кнопке
+        document.getElementById('send-data-btn').addEventListener('click', () => {
+            const dataToSend = {
+                choice: "Пользователь нажал на кнопку!",
+                time: new Date().toLocaleTimeString()
+            };
+
+            // Отправляем данные обратно в бот (в формате JSON-строки)
+            // ВАЖНО: tg.sendData() работает только если Mini App открыт через KeyboardButton!
+            tg.sendData(JSON.stringify(dataToSend));
+
+            // Закрываем Mini App
+            tg.close();
+        });
+    </script>
+</body>
+</html>
