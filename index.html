@@ -6,40 +6,637 @@
     <title>Tojir App</title>
     <!-- 1. Подключаем официальный JS SDK Telegram -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+     <!-- Bootstrap CSS (jsDelivr CDN) -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+  <!-- Bootstrap Bundle JS (jsDelivr CDN) -->
+  <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
     <style>
-        body {
-            /* Переменные var(--tg-theme-...) берутся автоматически из темы Telegram пользователя */
-            background-color: var(--tg-theme-bg-color, #ffffff);
-            color: var(--tg-theme-text-color, #000000);
-            font-family: sans-serif;
-            text-align: center;
-            padding: 20px;
-            margin: 0;
-        }
-        h1 {
-            font-size: 24px;
-        }
-        .btn {
-            background-color: var(--tg-theme-button-color, #2481cc);
-            color: var(--tg-theme-button-text-color, #ffffff);
-            border: none;
-            padding: 12px 24px;
-            border-radius: 8px;
-            font-size: 16px;
-            cursor: pointer;
-            margin-top: 20px;
-            width: 80%;
-        }
+        :root {
+      --brand:       #0F62FE;
+      --brand-light: #EBF3FF;
+      --brand-mid:   #3D7FFC;
+      --ink:         #0A0A0F;
+      --ink-muted:   #6B7280;
+      --border:      #D1D5DB;
+      --border-focus:#0F62FE;
+      --surface:     #FFFFFF;
+      --surface-alt: #F5F7FA;
+      --danger:      #DC2626;
+      --success:     #16A34A;
+      --radius:      10px;
+      --transition:  0.18s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+ 
+    *, *::before, *::after { box-sizing: border-box; }
+ 
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--surface-alt);
+      color: var(--ink);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+    }
+ 
+    /* ── Page scaffold ── */
+    .page-wrap {
+      width: 100%;
+      max-width: 900px;
+    }
+ 
+    .page-header {
+      margin-bottom: 3rem;
+    }
+    .page-header .eyebrow {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--brand);
+      margin-bottom: 0.5rem;
+    }
+    .page-header h1 {
+      font-size: clamp(1.6rem, 4vw, 2.6rem);
+      font-weight: 600;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      color: var(--ink);
+      margin: 0 0 0.75rem;
+    }
+    .page-header p {
+      font-size: 0.95rem;
+      color: var(--ink-muted);
+      max-width: 52ch;
+      line-height: 1.65;
+      margin: 0;
+    }
+ 
+    /* ── Card container ── */
+    .form-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2.5rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 8px 24px rgba(0,0,0,0.04);
+    }
+ 
+    .form-section-title {
+      font-size: 0.7rem;
+      font-family: 'DM Mono', monospace;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+      margin-bottom: 1.25rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+ 
+    /* ── Bootstrap form-floating overrides ── */
+    .form-floating {
+      position: relative;
+    }
+ 
+    /* Input & Select base */
+    .form-floating > .form-control,
+    .form-floating > .form-select {
+      height: 56px;
+      padding: 1rem 1rem 0;
+      font-size: 0.9375rem;
+      font-family: 'DM Sans', sans-serif;
+      color: var(--ink);
+      background-color: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      transition: border-color var(--transition), box-shadow var(--transition), background-color var(--transition);
+      box-shadow: none;
+      outline: none;
+      appearance: none;
+    }
+ 
+    /* Textarea */
+    .form-floating > textarea.form-control {
+      height: 110px;
+      padding-top: 1.5rem;
+      resize: none;
+    }
+ 
+    /* Focus ring */
+    .form-floating > .form-control:focus,
+    .form-floating > .form-select:focus {
+      border-color: var(--border-focus);
+      background-color: var(--brand-light);
+      box-shadow: 0 0 0 3px rgba(15, 98, 254, 0.12);
+    }
+ 
+    /* Disabled */
+    .form-floating > .form-control:disabled {
+      background-color: var(--surface-alt);
+      color: var(--ink-muted);
+      cursor: not-allowed;
+    }
+ 
+    /* Label */
+    .form-floating > label {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      padding: 1rem 1rem;
+      font-size: 0.875rem;
+      font-weight: 400;
+      color: var(--ink-muted);
+      pointer-events: none;
+      transform-origin: 0 0;
+      transition: opacity var(--transition), transform var(--transition), color var(--transition);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
+    }
+ 
+    /* Floated state: focus OR has value */
+    .form-floating > .form-control:focus ~ label,
+    .form-floating > .form-control:not(:placeholder-shown) ~ label,
+    .form-floating > .form-select ~ label {
+      transform: scale(0.78) translateY(-0.55rem) translateX(0.1rem);
+      color: var(--brand);
+      font-weight: 500;
+      opacity: 1;
+    }
+ 
+    /* Disabled floated */
+    .form-floating > .form-control:disabled ~ label {
+      color: var(--ink-muted);
+    }
+ 
+    /* Validation states */
+    .form-floating.is-invalid > .form-control {
+      border-color: var(--danger);
+      background-color: #FEF2F2;
+    }
+    .form-floating.is-invalid > .form-control:focus {
+      box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.12);
+    }
+    .form-floating.is-invalid > .form-control:focus ~ label,
+    .form-floating.is-invalid > .form-control:not(:placeholder-shown) ~ label {
+      color: var(--danger);
+    }
+    .form-floating.is-valid > .form-control {
+      border-color: var(--success);
+      background-color: #F0FDF4;
+    }
+    .form-floating.is-valid > .form-control:focus {
+      box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.12);
+    }
+    .form-floating.is-valid > .form-control:focus ~ label,
+    .form-floating.is-valid > .form-control:not(:placeholder-shown) ~ label {
+      color: var(--success);
+    }
+ 
+    /* Hint / validation text */
+    .field-hint {
+      font-size: 0.78rem;
+      color: var(--ink-muted);
+      margin-top: 0.35rem;
+      padding-left: 0.15rem;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+    .field-hint.error  { color: var(--danger); }
+    .field-hint.ok     { color: var(--success); }
+ 
+    /* Icon inside input */
+    .input-icon-wrap {
+      position: relative;
+    }
+    .input-icon-wrap .form-control {
+      padding-right: 2.75rem;
+    }
+    .input-icon-wrap .field-icon {
+      position: absolute;
+      right: 0.875rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--ink-muted);
+      pointer-events: none;
+      line-height: 1;
+    }
+    .input-icon-wrap .field-icon.clickable {
+      pointer-events: auto;
+      cursor: pointer;
+      transition: color var(--transition);
+    }
+    .input-icon-wrap .field-icon.clickable:hover { color: var(--brand); }
+ 
+    /* Submit button */
+    .btn-submit {
+      height: 48px;
+      padding: 0 1.75rem;
+      background: var(--brand);
+      color: #fff;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 500;
+      border: none;
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
+      letter-spacing: -0.01em;
+    }
+    .btn-submit:hover {
+      background: var(--brand-mid);
+      box-shadow: 0 4px 14px rgba(15, 98, 254, 0.3);
+      transform: translateY(-1px);
+    }
+    .btn-submit:active { transform: translateY(0); }
+ 
+    .btn-ghost {
+      height: 48px;
+      padding: 0 1.25rem;
+      background: transparent;
+      color: var(--ink-muted);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 400;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: border-color var(--transition), color var(--transition);
+    }
+    .btn-ghost:hover { border-color: var(--ink-muted); color: var(--ink); }
+ 
+    /* Tag chips for the "plan" select */
+    .plan-chips {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-top: 0.5rem;
+    }
+    .plan-chip {
+      font-size: 0.72rem;
+      font-family: 'DM Mono', monospace;
+      letter-spacing: 0.04em;
+      padding: 0.25rem 0.65rem;
+      border-radius: 999px;
+      border: 1.5px solid var(--border);
+      color: var(--ink-muted);
+      cursor: pointer;
+      transition: all var(--transition);
+      user-select: none;
+    }
+    .plan-chip.active,
+    .plan-chip:hover {
+      border-color: var(--brand);
+      color: var(--brand);
+      background: var(--brand-light);
+    }
+ 
+    /* Divider */
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 2rem 0;
+    }
+ 
+    /* Pill badge next to section title */
+    .badge-pill {
+      display: inline-block;
+      font-size: 0.65rem;
+      font-family: 'DM Mono', monospace;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 0.2rem 0.55rem;
+      border-radius: 999px;
+      background: var(--brand-light);
+      color: var(--brand);
+      vertical-align: middle;
+      margin-left: 0.5rem;
+    }
+ 
+    /* Responsive */
+    @media (max-width: 576px) {
+      .form-card { padding: 1.5rem 1.25rem; }
+    }
+ 
+    /* Subtle entry animation */
+    .form-card {
+      animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1) both;
+    }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
     </style>
 </head>
 <body>
 
-    <h1>Привет, <span id="user-name">Гость</span>!</h1>
-    <p>Это пример простого Telegram Mini App.</p>
-    
-    <button class="btn" id="send-data-btn">Отправить данные в бот</button>
+    <div class="page-wrap">
+ 
+  <!-- Header -->
+  <div class="page-header">
+    <p class="eyebrow">Tojir Plast</p>
+    <h1>Для распределения товаров</h1>
+  </div>
+ 
+  <div class="form-card">
+    <div class="row g-3 mb-4">
+      <!-- ── Section 2: Select & Textarea ── -->
+      <p class="form-section-title">Выбор &amp; Поставщик <span class="badge-pill">Всегда выберете поставщика</span></p>
+ 
+<!-- Select — label is always in floated position -->
+      <div class="col-md-6">
+    <div class="form-floating">
+      <select class="form-select" id="plan">
+        <!-- По умолчанию выбираем 'Umed', чтобы совпадало с активным чипсом -->
+        <option value="Umed" selected>Умед</option>
+        <option value="Sheix">Шейх</option>
+        <option value="Sodikion">Содикиен</option>
+        <option value="Ikrom">Икром</option>
+        <option value="China">Хитой</option>
+        <option value="Other1">Другое 1</option>
+        <option value="Other2">Другое 2</option>
+      </select>
+      <label for="plan">Поставщик</label>
+    </div>
 
+    <div class="plan-chips mt-2">
+      <span class="plan-chip active" data-value="Umed">Умед</span>
+      <span class="plan-chip" data-value="Sheix">Шейх</span>
+      <span class="plan-chip" data-value="Sodikion">Содикиен</span>
+      <span class="plan-chip" data-value="Ikrom">Икром</span>
+      <span class="plan-chip" data-value="China">Хитой</span>
+      <span class="plan-chip" data-value="Other1">Другое 1</span>
+      <span class="plan-chip" data-value="Other2">Другое 2</span>
+    </div>
+  </div>
+    </div>
+    <!-- Исходный вес партии -->
+    <div class="form-floating mb-3">
+      <input type="number" step="0.01" min="1" class="form-control fw-bold fs-5" id="baseWeight" value="1000" placeholder="1000">
+      <label for="baseWeight">Общий исходный вес (кг)</label>
+    </div>
+
+    <h6 class="text-secondary fw-bold mb-2">Операции списания:</h6>
+
+    <!-- Список динамических блоков списания -->
+    <div id="operationsList"></div>
+
+    <!-- Информационная плашка с итогами -->
+    <div class="alert alert-primary p-3 mt-2" id="summaryPanel">
+      <div class="d-flex justify-content-between border-bottom pb-2 mb-2 text-danger">
+        <span>Всего списано:</span>
+        <span class="fw-bold" id="totalMinusDisplay">-0.00 кг</span>
+      </div>
+      <div class="d-flex justify-content-between fs-5 fw-bold text-success">
+        <span>Текущий остаток:</span>
+        <span id="finalWeightDisplay">100 кг</span>
+      </div>
+    </div>
+    <div class="divider"></div>
+    <!-- ── Actions ── -->
+    <button class="btn-send mt-2" id="sendDataBtn" disabled>Списать полностью в 0 кг</button>
+ 
+ 
+  </div><!-- /form-card -->
+ 
+</div>
+    <!--<button class="btn" id="send-data-btn">Отправить данные в бот</button>-->
     <script>
+      // Инициализируем Telegram WebApp
+    const tg = window.Telegram.WebApp;
+    tg.ready();
+    tg.expand();
+
+    // Список видов товаров
+    const PRODUCT_TYPES = [
+      "вторичка",
+      "кабуд",
+      "ранга",
+      "3840гранд",
+      "3840(м)",
+      "БЛ3(кабуд)",
+      "БЛ3(ранга)"
+    ];
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const baseWeightInput = document.getElementById('baseWeight');
+      const operationsList = document.getElementById('operationsList');
+      const totalMinusDisplay = document.getElementById('totalMinusDisplay');
+      const finalWeightDisplay = document.getElementById('finalWeightDisplay');
+      const summaryPanel = document.getElementById('summaryPanel');
+      const sendDataBtn = document.getElementById('sendDataBtn');
+
+      // Шаблон создания нового блока (Товар + Контейнер + Вес)
+      function createOperationBlock(index) {
+        const block = document.createElement('div');
+        block.className = 'operation-card';
+        block.id = `block-${index}`;
+
+        // Генерация опций товаров
+        let productOptions = `<option value="" disabled selected>Выберите вид товара...</option>`;
+        PRODUCT_TYPES.forEach(item => {
+          productOptions += `<option value="${item}">${item}</option>`;
+        });
+
+        // Генерация опций контейнеров (1-20)
+        let containerOptions = `<option value="" disabled selected>Выберите контейнер...</option>`;
+        for (let i = 1; i <= 20; i++) {
+          containerOptions += `<option value="${i}">Контейнер №${i}</option>`;
+        }
+
+        block.innerHTML = `
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <span class="fw-bold text-primary block-title">Списание №${index}</span>
+            <span class="badge bg-secondary step-remainder">Остаток до: 0.00 кг</span>
+          </div>
+
+          <div class="row g-2">
+            <!-- 1. Выбор вида товара -->
+            <div class="col-12 col-sm-6">
+              <div class="form-floating">
+                <select class="form-select op-product">
+                  ${productOptions}
+                </select>
+                <label>Вид товара</label>
+              </div>
+            </div>
+
+            <!-- 2. Выбор контейнера -->
+            <div class="col-12 col-sm-6">
+              <div class="form-floating">
+                <select class="form-select op-container">
+                  ${containerOptions}
+                </select>
+                <label>Контейнер (1-20)</label>
+              </div>
+            </div>
+
+            <!-- 3. Вес для списания -->
+            <div class="col-12">
+              <div class="form-floating">
+                <input type="number" step="0.01" min="0" class="form-control op-weight" placeholder="0.00">
+                <label>Списать вес (кг)</label>
+              </div>
+            </div>
+          </div>
+        `;
+
+        operationsList.appendChild(block);
+
+        // Вешаем слушатели событий на поля нового блока
+        block.querySelector('.op-weight').addEventListener('input', recalculate);
+        block.querySelector('.op-product').addEventListener('change', recalculate);
+        block.querySelector('.op-container').addEventListener('change', recalculate);
+      }
+
+      // Создаем самый первый блок при старте
+      createOperationBlock(1);
+
+      // Главная логика перерасчета и добавления/удаления блоков
+      function recalculate() {
+        const base = parseFloat(baseWeightInput.value) || 0;
+        let blocks = Array.from(document.querySelectorAll('.operation-card'));
+        let currentRemainder = base;
+
+        // Пересчитываем вес по цепочке
+        for (let i = 0; i < blocks.length; i++) {
+          const block = blocks[i];
+          const remainderBadge = block.querySelector('.step-remainder');
+          const weightInput = block.querySelector('.op-weight');
+
+          remainderBadge.textContent = `Доступно: ${currentRemainder.toFixed(2)} кг`;
+
+          let wVal = parseFloat(weightInput.value) || 0;
+
+          // Защита: нельзя списать больше, чем осталось
+          if (wVal > currentRemainder) {
+            wVal = currentRemainder;
+            weightInput.value = wVal.toFixed(2);
+          }
+
+          currentRemainder -= wVal;
+        }
+
+        // Округляем до 2 знаков во избежание микро-дробных погрешностей JS (напр. 0.0000001)
+        currentRemainder = Math.max(0, Math.round(currentRemainder * 100) / 100);
+
+        // --- ПРОВЕРКА: НУЖНО ЛИ ДОБАВИТЬ СЛЕДУЮЩИЙ БЛОК? ---
+        const lastBlock = blocks[blocks.length - 1];
+        const lastWeight = parseFloat(lastBlock.querySelector('.op-weight').value) || 0;
+        const lastProd = lastBlock.querySelector('.op-product').value;
+        const lastCont = lastBlock.querySelector('.op-container').value;
+
+        // Если в текущем блоке введен вес > 0, выбраны товар и контейнер, И ОСТАТОК ВСЕ ЕЩЕ > 0:
+        if (lastWeight > 0 && lastProd && lastCont && currentRemainder > 0) {
+          createOperationBlock(blocks.length + 1);
+          recalculate();
+          return;
+        }
+
+        // --- УДАЛЕНИЕ ЛИШНИХ БЛОКОВ ЕСЛИ ВЕС ИСПРАВИЛИ НАЗАД ---
+        let removedAny = false;
+        while (blocks.length > 1) {
+          const curLast = blocks[blocks.length - 1];
+          const curLastWeight = parseFloat(curLast.querySelector('.op-weight').value) || 0;
+          const prevBlock = blocks[blocks.length - 2];
+          const prevWeight = parseFloat(prevBlock.querySelector('.op-weight').value) || 0;
+
+          // Если последний блок пустой, а перед ним уже остаток 0 или вес обнулен:
+          if (curLastWeight === 0 && (currentRemainder === 0 || prevWeight === 0)) {
+            curLast.remove();
+            blocks.pop();
+            removedAny = true;
+          } else {
+            break;
+          }
+        }
+
+        if (removedAny) {
+          // Корректируем заголовки Списание №1, №2
+          document.querySelectorAll('.operation-card').forEach((b, i) => {
+            b.querySelector('.block-title').textContent = `Списание №${i + 1}`;
+          });
+        }
+
+        // Обновляем нижнюю плашку результатов
+        const totalSubtracted = base - currentRemainder;
+        totalMinusDisplay.textContent = `-${totalSubtracted.toFixed(2)} кг`;
+        finalWeightDisplay.textContent = `${currentRemainder.toFixed(2)} кг`;
+
+        // Проверяем валидность для кнопки отправки
+        let allValid = true;
+        blocks.forEach(b => {
+          const p = b.querySelector('.op-product').value;
+          const c = b.querySelector('.op-container').value;
+          const w = parseFloat(b.querySelector('.op-weight').value) || 0;
+          if (!p || !c || w <= 0) allValid = false;
+        });
+
+        // Если всё расписано строго в 0 и все поля заполнены:
+        if (currentRemainder === 0 && totalSubtracted > 0 && allValid) {
+          summaryPanel.classList.replace('alert-primary', 'alert-success');
+          sendDataBtn.removeAttribute('disabled');
+          sendDataBtn.textContent = '✅ Списать и отправить в бот';
+        } else {
+          summaryPanel.classList.replace('alert-success', 'alert-primary');
+          sendDataBtn.setAttribute('disabled', 'true');
+          sendDataBtn.textContent = currentRemainder > 0 
+            ? `Остаток ${currentRemainder.toFixed(2)} кг (распишите до 0)` 
+            : 'Заполните все поля';
+        }
+      }
+
+      baseWeightInput.addEventListener('input', recalculate);
+
+      // Отправка данных в Telegram бот
+      sendDataBtn.addEventListener('click', () => {
+        const blocks = Array.from(document.querySelectorAll('.operation-card'));
+        const operationsData = blocks.map((b, index) => ({
+          step: index + 1,
+          product: b.querySelector('.op-product').value,
+          container: b.querySelector('.op-container').value,
+          weight: parseFloat(b.querySelector('.op-weight').value)
+        }));
+
+        const resultJson = {
+          startWeight: parseFloat(baseWeightInput.value),
+          operations: operationsData,
+          totalSubtracted: operationsData.reduce((sum, o) => sum + o.weight, 0),
+          remainder: 0
+        };
+
+        // Отправляем структурированные данные обратно в C#-бот
+        tg.sendData(JSON.stringify(resultJson));
+        tg.close();
+      });
+
+      recalculate();
+    });
+  </script>
+    <script>
+  // Plan chips sync with select
+  const planSelect = document.getElementById('plan');
+  const chips = document.querySelectorAll('.plan-chip');
+ 
+  chips.forEach(chip => {
+    chip.addEventListener('click', () => {
+      planSelect.value = chip.dataset.value;
+      chips.forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+    });
+  });
+ 
+  planSelect.addEventListener('change', () => {
+    chips.forEach(c => {
+      c.classList.toggle('active', c.dataset.value === planSelect.value);
+    });
+  });
+    </script>
+    <!--<script>
         // Инициализируем Telegram WebApp
         const tg = window.Telegram.WebApp;
         tg.ready(); // Сообщаем Telegram, что приложение готово к отрисовке
@@ -65,6 +662,6 @@
             // Закрываем Mini App
             tg.close();
         });
-    </script>
+    </script>-->
 </body>
 </html>
