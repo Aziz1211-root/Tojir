@@ -423,6 +423,7 @@
     ];
 
     document.addEventListener('DOMContentLoaded', () => {
+      const postt = document.getElementById('plan');
       const baseWeightInput = document.getElementById('baseWeight');
       const operationsList = document.getElementById('operationsList');
       const totalMinusDisplay = document.getElementById('totalMinusDisplay');
@@ -603,6 +604,7 @@
         }));
 
         const resultJson = {
+          postt: postt.value,
           startWeight: parseFloat(baseWeightInput.value),
           operations: operationsData,
           totalSubtracted: operationsData.reduce((sum, o) => sum + o.weight, 0),
