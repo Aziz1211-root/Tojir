@@ -12,7 +12,7 @@
   <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 
     <style>
-        :root {
+    :root {
       --brand:       #0F62FE;
       --brand-light: #EBF3FF;
       --brand-mid:   #3D7FFC;
@@ -333,47 +333,46 @@
     </style>
 </head>
 <body>
-
-    <div class="page-wrap">
- 
+<div class="page-wrap">
   <!-- Header -->
   <div class="page-header">
     <p class="eyebrow">Tojir Plast</p>
     <h1>Для распределения товаров</h1>
   </div>
- 
+  <!-- /Header -->
+  <!-- form-card --> 
   <div class="form-card">
-    <div class="row g-3 mb-4">
-      <!-- ── Section 2: Select & Textarea ── -->
-      <p class="form-section-title">Выбор &amp; Поставщик <span class="badge-pill">Всегда выберете поставщика</span></p>
- 
-<!-- Select — label is always in floated position -->
-      <div class="col-md-6">
-    <div class="form-floating">
-      <select class="form-select" id="plan">
-        <!-- По умолчанию выбираем 'Umed', чтобы совпадало с активным чипсом -->
-        <option value="Umed" selected>Умед</option>
-        <option value="Sheix">Шейх</option>
-        <option value="Sodikion">Содикиен</option>
-        <option value="Ikrom">Икром</option>
-        <option value="China">Хитой</option>
-        <option value="Other1">Другое 1</option>
-        <option value="Other2">Другое 2</option>
-      </select>
-      <label for="plan">Поставщик</label>
-    </div>
-
-    <div class="plan-chips mt-2">
-      <span class="plan-chip active" data-value="Umed">Умед</span>
-      <span class="plan-chip" data-value="Sheix">Шейх</span>
-      <span class="plan-chip" data-value="Sodikion">Содикиен</span>
-      <span class="plan-chip" data-value="Ikrom">Икром</span>
-      <span class="plan-chip" data-value="China">Хитой</span>
-      <span class="plan-chip" data-value="Other1">Другое 1</span>
-      <span class="plan-chip" data-value="Other2">Другое 2</span>
-    </div>
+  <div class="row g-3 mb-4">
+    <!-- ── Section 2: Select & Textarea ── -->
+    <p class="form-section-title">Выбор &amp; Поставщик <span class="badge-pill">Всегда выберете поставщика</span></p>
+    <!-- ── /Section 2: Select & Textarea ── -->
+    <!-- Select — label is always in floated position -->
+    <div class="col-md-6">
+      <div class="form-floating">
+        <select class="form-select" id="plan">
+         <!-- По умолчанию выбираем 'Umed', чтобы совпадало с активным чипсом -->
+         <option value="Umed" selected>Умед</option>
+         <option value="Sheix">Шейх</option>
+         <option value="Sodikion">Содикиен</option>
+         <option value="Ikrom">Икром</option>
+         <option value="China">Хитой</option>
+         <option value="Other1">Другое 1</option>
+         <option value="Other2">Другое 2</option>
+        </select>
+         <label for="plan">Поставщик</label>
+      </div>
+      <div class="plan-chips mt-2">
+          <span class="plan-chip active" data-value="Umed">Умед</span>
+          <span class="plan-chip" data-value="Sheix">Шейх</span>
+          <span class="plan-chip" data-value="Sodikion">Содикиен</span>
+          <span class="plan-chip" data-value="Ikrom">Икром</span>
+          <span class="plan-chip" data-value="China">Хитой</span>
+          <span class="plan-chip" data-value="Other1">Другое 1</span>
+          <span class="plan-chip" data-value="Other2">Другое 2</span>
+      </div>
   </div>
-    </div>
+  <!-- /Select — label is always in floated position -->
+  </div>
     <!-- Исходный вес партии -->
     <div class="form-floating mb-3">
       <input type="number" step="0.01" min="1" class="form-control fw-bold fs-5" id="baseWeight" value="1000" placeholder="1000">
@@ -398,14 +397,12 @@
     </div>
     <div class="divider"></div>
     <!-- ── Actions ── -->
-    <button class="btn-send mt-2" id="sendDataBtn" disabled>Списать полностью в 0 кг</button>
- 
- 
-  </div><!-- /form-card -->
+    <button class="btn btn-primary" id="sendDataBtn" disabled>Списать полностью в 0 кг</button>
+  </div>
+  <!-- /form-card -->
  
 </div>
-    <!--<button class="btn" id="send-data-btn">Отправить данные в бот</button>-->
-    <script>
+  <script>
       // Инициализируем Telegram WebApp
     const tg = window.Telegram.WebApp;
     tg.ready();
@@ -619,11 +616,10 @@
       recalculate();
     });
   </script>
-    <script>
+  <script>
   // Plan chips sync with select
   const planSelect = document.getElementById('plan');
   const chips = document.querySelectorAll('.plan-chip');
- 
   chips.forEach(chip => {
     chip.addEventListener('click', () => {
       planSelect.value = chip.dataset.value;
@@ -631,39 +627,11 @@
       chip.classList.add('active');
     });
   });
- 
   planSelect.addEventListener('change', () => {
     chips.forEach(c => {
       c.classList.toggle('active', c.dataset.value === planSelect.value);
     });
   });
-    </script>
-    <!--<script>
-        // Инициализируем Telegram WebApp
-        const tg = window.Telegram.WebApp;
-        tg.ready(); // Сообщаем Telegram, что приложение готово к отрисовке
-        tg.expand(); // Расширяем приложение на весь экран телефона
-
-        // Достаем имя пользователя из Telegram
-        if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
-            const user = tg.initDataUnsafe.user;
-            document.getElementById('user-name').innerText = user.first_name;
-        }
-
-        // Обработка клика по кнопке
-        document.getElementById('send-data-btn').addEventListener('click', () => {
-            const dataToSend = {
-                choice: "Пользователь нажал на кнопку!",
-                time: new Date().toLocaleTimeString()
-            };
-
-            // Отправляем данные обратно в бот (в формате JSON-строки)
-            // ВАЖНО: tg.sendData() работает только если Mini App открыт через KeyboardButton!
-            tg.sendData(JSON.stringify(dataToSend));
-
-            // Закрываем Mini App
-            tg.close();
-        });
-    </script>-->
+  </script>
 </body>
 </html>
