@@ -1,388 +1,596 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tojir App</title>
-    <!-- 1. Подключаем официальный JS SDK Telegram -->
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-     <!-- Bootstrap CSS (jsDelivr CDN) -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-  <!-- Bootstrap Bundle JS (jsDelivr CDN) -->
-  <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-
-    <style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Учет контейнеров Tojir plast</title>
+  <!-- Подключение SDK Telegram Web Apps -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
     :root {
-      --brand:       #0F62FE;
-      --brand-light: #EBF3FF;
-      --brand-mid:   #3D7FFC;
-      --ink:         #0A0A0F;
-      --ink-muted:   #6B7280;
-      --border:      #D1D5DB;
-      --border-focus:#0F62FE;
-      --surface:     #FFFFFF;
-      --surface-alt: #F5F7FA;
-      --danger:      #DC2626;
-      --success:     #16A34A;
-      --radius:      10px;
-      --transition:  0.18s cubic-bezier(0.4, 0, 0.2, 1);
+      --tg-bg: var(--tg-theme-bg-color, #f4f4f7);
+      --tg-sec-bg: var(--tg-theme-secondary-bg-color, #ffffff);
+      --tg-text: var(--tg-theme-text-color, #000000);
+      --tg-hint: var(--tg-theme-hint-color, #8e8e93);
+      --tg-link: var(--tg-theme-link-color, #007aff);
+      --tg-btn: var(--tg-theme-button-color, #007aff);
+      --tg-btn-text: var(--tg-theme-button-text-color, #ffffff);
+      
+      --danger: #ff3b30;
+      --success: #34c759;
     }
- 
-    *, *::before, *::after { box-sizing: border-box; }
- 
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
     body {
-      font-family: 'DM Sans', sans-serif;
-      background: var(--surface-alt);
-      color: var(--ink);
-      min-height: 100vh;
+      background-color: var(--tg-bg);
+      color: var(--tg-text);
+      padding: 12px 12px 80px 12px;
+      font-size: 16px;
+      user-select: none;
+    }
+
+    header {
+      margin-bottom: 16px;
+      padding: 4px;
+    }
+
+    header h1 {
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    header p {
+      font-size: 13px;
+      color: var(--tg-hint);
+      margin-top: 2px;
+    }
+
+    .containers-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .accordion-item {
+      background: var(--tg-sec-bg);
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid rgba(0, 0, 0, 0.05);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    }
+
+    .accordion-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 16px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 15px;
+    }
+
+    .accordion-header:active {
+      background-color: rgba(0, 0, 0, 0.03);
+    }
+
+    .accordion-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: var(--tg-hint);
+    }
+
+    .status-dot.has-stock {
+      background-color: var(--success);
+    }
+
+    .accordion-total {
+      font-size: 13px;
+      color: var(--tg-hint);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .arrow {
+      border: solid var(--tg-hint);
+      border-width: 0 2px 2px 0;
+      display: inline-block;
+      padding: 3px;
+      transform: rotate(45deg);
+      transition: transform 0.2s;
+    }
+
+    .accordion-item.active .arrow {
+      transform: rotate(-135deg);
+    }
+
+    .accordion-content {
+      display: none;
+      border-top: 1px solid rgba(0, 0, 0, 0.05);
+      padding: 8px 16px 14px 16px;
+      background: var(--tg-sec-bg);
+    }
+
+    .accordion-item.active .accordion-content {
+      display: block;
+    }
+
+    .item-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+    }
+
+    .item-row:last-child {
+      border-bottom: none;
+    }
+
+    .item-info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .item-name {
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .item-qty {
+      font-size: 13px;
+      color: var(--tg-hint);
+      margin-top: 1px;
+    }
+
+    .item-qty span {
+      font-weight: 600;
+      color: var(--tg-text);
+    }
+
+    .btn-minus {
+      background-color: rgba(255, 59, 48, 0.1);
+      color: var(--danger);
+      border: none;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      font-size: 18px;
+      font-weight: 700;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 2rem 1rem;
+      cursor: pointer;
     }
- 
-    /* ── Page scaffold ── */
-    .page-wrap {
-      width: 100%;
-      max-width: 900px;
+
+    .btn-minus:active {
+      background-color: rgba(255, 59, 48, 0.2);
     }
- 
-    .page-header {
-      margin-bottom: 3rem;
-    }
-    .page-header .eyebrow {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.72rem;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--brand);
-      margin-bottom: 0.5rem;
-    }
-    .page-header h1 {
-      font-size: clamp(1.6rem, 4vw, 2.6rem);
-      font-weight: 600;
-      letter-spacing: -0.03em;
-      line-height: 1.1;
-      color: var(--ink);
-      margin: 0 0 0.75rem;
-    }
-    .page-header p {
-      font-size: 0.95rem;
-      color: var(--ink-muted);
-      max-width: 52ch;
-      line-height: 1.65;
-      margin: 0;
-    }
- 
-    /* ── Card container ── */
-    .form-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 2.5rem;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 8px 24px rgba(0,0,0,0.04);
-    }
- 
-    .form-section-title {
-      font-size: 0.7rem;
-      font-family: 'DM Mono', monospace;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--ink-muted);
-      margin-bottom: 1.25rem;
-      padding-bottom: 0.5rem;
-      border-bottom: 1px solid var(--border);
-    }
- 
-    /* ── Bootstrap form-floating overrides ── */
-    .form-floating {
-      position: relative;
-    }
- 
-    /* Input & Select base */
-    .form-floating > .form-control,
-    .form-floating > .form-select {
-      height: 56px;
-      padding: 1rem 1rem 0;
-      font-size: 0.9375rem;
-      font-family: 'DM Sans', sans-serif;
-      color: var(--ink);
-      background-color: var(--surface);
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius);
-      transition: border-color var(--transition), box-shadow var(--transition), background-color var(--transition);
-      box-shadow: none;
-      outline: none;
-      appearance: none;
-    }
- 
-    /* Textarea */
-    .form-floating > textarea.form-control {
-      height: 110px;
-      padding-top: 1.5rem;
-      resize: none;
-    }
- 
-    /* Focus ring */
-    .form-floating > .form-control:focus,
-    .form-floating > .form-select:focus {
-      border-color: var(--border-focus);
-      background-color: var(--brand-light);
-      box-shadow: 0 0 0 3px rgba(15, 98, 254, 0.12);
-    }
- 
-    /* Disabled */
-    .form-floating > .form-control:disabled {
-      background-color: var(--surface-alt);
-      color: var(--ink-muted);
+
+    .btn-minus:disabled {
+      background-color: rgba(0, 0, 0, 0.03);
+      color: var(--tg-hint);
+      opacity: 0.4;
       cursor: not-allowed;
     }
- 
-    /* Label */
-    .form-floating > label {
-      position: absolute;
-      top: 0;
-      left: 0;
-      height: 100%;
-      padding: 1rem 1rem;
-      font-size: 0.875rem;
-      font-weight: 400;
-      color: var(--ink-muted);
-      pointer-events: none;
-      transform-origin: 0 0;
-      transition: opacity var(--transition), transform var(--transition), color var(--transition);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      max-width: 100%;
+
+    /* Модальное окно (Bottom Sheet) */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.4);
+      z-index: 100;
+      display: none;
+      align-items: flex-end;
     }
- 
-    /* Floated state: focus OR has value */
-    .form-floating > .form-control:focus ~ label,
-    .form-floating > .form-control:not(:placeholder-shown) ~ label,
-    .form-floating > .form-select ~ label {
-      transform: scale(0.78) translateY(-0.55rem) translateX(0.1rem);
-      color: var(--brand);
+
+    .modal-backdrop.active {
+      display: flex;
+    }
+
+    .modal {
+      background: var(--tg-sec-bg);
+      width: 100%;
+      border-radius: 16px 16px 0 0;
+      padding: 20px 16px calc(20px + env(safe-area-inset-bottom));
+      box-shadow: 0 -4px 16px rgba(0,0,0,0.1);
+      animation: slideUp 0.25s cubic-bezier(0.1, 0.76, 0.55, 0.94);
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .modal-title {
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .btn-close {
+      background: none;
+      border: none;
+      font-size: 24px;
+      color: var(--tg-hint);
+      cursor: pointer;
+    }
+
+    .field-group {
+      margin-bottom: 18px;
+    }
+
+    .field-label {
+      display: block;
+      font-size: 13px;
+      color: var(--tg-hint);
+      margin-bottom: 6px;
       font-weight: 500;
-      opacity: 1;
     }
- 
-    /* Disabled floated */
-    .form-floating > .form-control:disabled ~ label {
-      color: var(--ink-muted);
+
+    .workshops-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 6px;
     }
- 
-    /* Validation states */
-    .form-floating.is-invalid > .form-control {
-      border-color: var(--danger);
-      background-color: #FEF2F2;
+
+    .workshop-btn {
+      background: var(--tg-bg);
+      color: var(--tg-text);
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      padding: 10px 0;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      text-align: center;
+      cursor: pointer;
     }
-    .form-floating.is-invalid > .form-control:focus {
-      box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.12);
+
+    .workshop-btn.active {
+      background: var(--tg-btn);
+      color: var(--tg-btn-text);
+      border-color: var(--tg-btn);
     }
-    .form-floating.is-invalid > .form-control:focus ~ label,
-    .form-floating.is-invalid > .form-control:not(:placeholder-shown) ~ label {
-      color: var(--danger);
-    }
-    .form-floating.is-valid > .form-control {
-      border-color: var(--success);
-      background-color: #F0FDF4;
-    }
-    .form-floating.is-valid > .form-control:focus {
-      box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.12);
-    }
-    .form-floating.is-valid > .form-control:focus ~ label,
-    .form-floating.is-valid > .form-control:not(:placeholder-shown) ~ label {
-      color: var(--success);
-    }
- 
-    /* Hint / validation text */
-    .field-hint {
-      font-size: 0.78rem;
-      color: var(--ink-muted);
-      margin-top: 0.35rem;
-      padding-left: 0.15rem;
+
+    .input-wrapper {
+      position: relative;
       display: flex;
       align-items: center;
-      gap: 0.3rem;
     }
-    .field-hint.error  { color: var(--danger); }
-    .field-hint.ok     { color: var(--success); }
- 
-    /* Icon inside input */
-    .input-icon-wrap {
-      position: relative;
+
+    .num-input {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      background: var(--tg-bg);
+      color: var(--tg-text);
+      font-size: 16px;
+      font-weight: 600;
+      outline: none;
     }
-    .input-icon-wrap .form-control {
-      padding-right: 2.75rem;
+
+    .num-input:focus {
+      border-color: var(--tg-btn);
     }
-    .input-icon-wrap .field-icon {
+
+    .input-suffix {
       position: absolute;
-      right: 0.875rem;
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--ink-muted);
-      pointer-events: none;
-      line-height: 1;
+      right: 12px;
+      font-weight: 600;
+      color: var(--tg-hint);
     }
-    .input-icon-wrap .field-icon.clickable {
-      pointer-events: auto;
-      cursor: pointer;
-      transition: color var(--transition);
-    }
-    .input-icon-wrap .field-icon.clickable:hover { color: var(--brand); }
- 
-    /* Submit button */
-    .btn-submit {
-      height: 48px;
-      padding: 0 1.75rem;
-      background: var(--brand);
-      color: #fff;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.9rem;
-      font-weight: 500;
+
+    .btn-confirm {
+      width: 100%;
+      background: var(--danger);
+      color: #ffffff;
+      padding: 14px;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 700;
       border: none;
-      border-radius: var(--radius);
       cursor: pointer;
-      transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
-      letter-spacing: -0.01em;
+      margin-top: 10px;
     }
-    .btn-submit:hover {
-      background: var(--brand-mid);
-      box-shadow: 0 4px 14px rgba(15, 98, 254, 0.3);
-      transform: translateY(-1px);
+
+    .btn-confirm:active {
+      opacity: 0.9;
     }
-    .btn-submit:active { transform: translateY(0); }
- 
-    .btn-ghost {
-      height: 48px;
-      padding: 0 1.25rem;
-      background: transparent;
-      color: var(--ink-muted);
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.9rem;
-      font-weight: 400;
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius);
+
+    .web-submit-btn {
+      position: fixed;
+      bottom: 16px;
+      left: 16px;
+      right: 16px;
+      background: var(--tg-btn);
+      color: var(--tg-btn-text);
+      border: none;
+      padding: 14px;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 700;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      z-index: 50;
       cursor: pointer;
-      transition: border-color var(--transition), color var(--transition);
     }
-    .btn-ghost:hover { border-color: var(--ink-muted); color: var(--ink); }
- 
-    /* Tag chips for the "plan" select */
-    .plan-chips {
-      display: flex;
-      gap: 0.5rem;
-      flex-wrap: wrap;
-      margin-top: 0.5rem;
-    }
-    .plan-chip {
-      font-size: 0.72rem;
-      font-family: 'DM Mono', monospace;
-      letter-spacing: 0.04em;
-      padding: 0.25rem 0.65rem;
-      border-radius: 999px;
-      border: 1.5px solid var(--border);
-      color: var(--ink-muted);
-      cursor: pointer;
-      transition: all var(--transition);
-      user-select: none;
-    }
-    .plan-chip.active,
-    .plan-chip:hover {
-      border-color: var(--brand);
-      color: var(--brand);
-      background: var(--brand-light);
-    }
- 
-    /* Divider */
-    .divider {
-      height: 1px;
-      background: var(--border);
-      margin: 2rem 0;
-    }
- 
-    /* Pill badge next to section title */
-    .badge-pill {
-      display: inline-block;
-      font-size: 0.65rem;
-      font-family: 'DM Mono', monospace;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      padding: 0.2rem 0.55rem;
-      border-radius: 999px;
-      background: var(--brand-light);
-      color: var(--brand);
-      vertical-align: middle;
-      margin-left: 0.5rem;
-    }
- 
-    /* Responsive */
-    @media (max-width: 576px) {
-      .form-card { padding: 1.5rem 1.25rem; }
-    }
- 
-    /* Subtle entry animation */
-    .form-card {
-      animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1) both;
-    }
-    @keyframes slideUp {
-      from { opacity: 0; transform: translateY(18px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-    </style>
+  </style>
 </head>
 <body>
-    <div class="page-wrap">
-        <!-- Header -->
-        <div class="page-header">
-            <p class="eyebrow">Tojir Plast</p>
-            <h1>Для распределения товаров по цехам</h1>
+
+  <header>
+    <h1>Списание из контейнеров</h1>
+    <p>Выберите контейнер и нажмите минус рядом с товаром</p>
+  </header>
+
+  <div class="containers-list" id="containersList"></div>
+
+  <!-- Кнопка сохранения для внешнего браузера -->
+  <button id="webSubmitBtn" class="web-submit-btn" style="display: none;" onclick="sendDataToBot()">Сохранить изменения</button>
+
+  <!-- Модальное окно списания -->
+  <div class="modal-backdrop" id="modalBackdrop" onclick="closeModal(event)">
+    <div class="modal" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <div>
+          <div class="modal-title" id="modalTitle">Списание товара</div>
+          <div style="font-size: 12px; color: var(--tg-hint); margin-top: 2px;" id="modalSubtitle"></div>
         </div>
-        <!-- /Header -->
-        <!-- form-card -->
-        <div class="form-card">
-            <div class="row g-3 mb-4">
-                <!-- ── Section 2: Select & Textarea ── -->
-                <p class="form-section-title">Выбор &amp; Цех <span class="badge-pill">Всегда выберете Цех</span></p>
-                <!-- ── /Section 2: Select & Textarea ── -->
-                <!-- Select — label is always in floated position -->
-                <!-- /Select — label is always in floated position -->
+        <button class="btn-close" onclick="closeModal(force=true)">&times;</button>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Укажите вес для списания (кг):</label>
+        <div class="input-wrapper">
+          <input type="number" id="amountInput" class="num-input" placeholder="0" min="0" step="any" oninput="validateInput()">
+          <span class="input-suffix">кг</span>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Выберите получателя (Цех):</label>
+        <div class="workshops-grid">
+          <div class="workshop-btn active" onclick="selectWorkshop(1)" id="ws1">1</div>
+          <div class="workshop-btn" onclick="selectWorkshop(2)" id="ws2">2</div>
+          <div class="workshop-btn" onclick="selectWorkshop(3)" id="ws3">3</div>
+          <div class="workshop-btn" onclick="selectWorkshop(4)" id="ws4">4</div>
+          <div class="workshop-btn" onclick="selectWorkshop(5)" id="ws5">5</div>
+        </div>
+      </div>
+
+      <button class="btn-confirm" onclick="confirmTransfer()">Списать в Цех <span id="wsSelectedLabel">1</span></button>
+    </div>
+  </div>
+
+  <script>
+    const PRODUCT_NAMES = [
+      "Вторичка",
+      "Кабуд",
+      "Ранга",
+      "3840гранд",
+      "3840(м)",
+      "БЛЗ(кабуд)",
+      "БЛЗ(ранга)"
+    ];
+
+    const containersData = {};
+    const operationsData = []; // Массив сделанных списаний
+    let activeContainerId = null;
+    let activeProductIdx = null;
+    let selectedWorkshop = 1;
+
+    // Инициализация Telegram WebApp
+    const tg = window.Telegram ? window.Telegram.WebApp : null;
+
+    if (tg) {
+      tg.ready();
+      tg.expand();
+      tg.MainButton.setText("СОХРАНИТЬ ИЗМЕНЕНИЯ");
+      tg.MainButton.show();
+      tg.MainButton.onClick(sendDataToBot);
+    } else {
+      document.getElementById('webSubmitBtn').style.display = 'block';
+    }
+
+    function loadUrlData() {
+      const params = new URLSearchParams(window.location.search);
+      for (let i = 1; i <= 20; i++) {
+        const raw = params.get(`cont${i}`);
+        if (raw) {
+          const values = raw.split(',').map(v => parseFloat(v.trim()) || 0);
+          while (values.length < PRODUCT_NAMES.length) values.push(0);
+          containersData[i] = values.slice(0, PRODUCT_NAMES.length);
+        } else {
+          containersData[i] = new Array(PRODUCT_NAMES.length).fill(0);
+        }
+      }
+    }
+
+    function renderContainers() {
+      const containerList = document.getElementById('containersList');
+      const openStates = {};
+      document.querySelectorAll('.accordion-item').forEach((item, index) => {
+        openStates[index + 1] = item.classList.contains('active');
+      });
+
+      containerList.innerHTML = '';
+
+      for (let i = 1; i <= 20; i++) {
+        const items = containersData[i];
+        const total = parseFloat(items.reduce((acc, v) => acc + v, 0).toFixed(3));
+        const hasStock = total > 0;
+
+        const itemDiv = document.createElement('div');
+        itemDiv.className = `accordion-item ${openStates[i] ? 'active' : ''}`;
+        itemDiv.id = `accordion-${i}`;
+
+        let productsHtml = '';
+        items.forEach((qty, idx) => {
+          productsHtml += `
+            <div class="item-row">
+              <div class="item-info">
+                <span class="item-name">${PRODUCT_NAMES[idx]}</span>
+                <span class="item-qty">Остаток: <span>${qty} кг</span></span>
+              </div>
+              <button class="btn-minus" ${qty <= 0 ? 'disabled' : ''} onclick="openMinusModal(${i}, ${idx}, event)">−</button>
             </div>
+          `;
+        });
 
+        itemDiv.innerHTML = `
+          <div class="accordion-header" onclick="toggleAccordion(${i})">
+            <div class="accordion-title">
+              <div class="status-dot ${hasStock ? 'has-stock' : ''}"></div>
+              Контейнер #${i}
+            </div>
+            <div class="accordion-total">
+              ${total} кг
+              <i class="arrow"></i>
+            </div>
+          </div>
+          <div class="accordion-content">
+            ${productsHtml}
+          </div>
+        `;
 
-            <h6 class="text-secondary fw-bold mb-2">Операции списания:</h6>
+        containerList.appendChild(itemDiv);
+      }
+    }
 
-            <!-- Список динамических блоков списания -->
-            <div id="operationsList"></div>
+    function toggleAccordion(id) {
+      const item = document.getElementById(`accordion-${id}`);
+      if (item) {
+        item.classList.toggle('active');
+      }
+    }
 
-            <div class="divider"></div>
-            <!-- ── Actions ── -->
-            <button class="btn btn-primary" id="sendDataBtn" disabled>ОК</button>
-        </div>
-        <!-- /form-card -->
-        <script>
-          // Инициализируем Telegram WebApp
-          const tg = window.Telegram.WebApp;
-          tg.ready();
-          tg.expand();
-         </script>
-         <script>
-          // Ждем загрузки страницы
-          window.onload = () => {
-          // Получаем параметры из URL
-          const urlParams = new URLSearchParams(window.location.search);
-    
-          const data = urlParams.get('data'); // Получит "12345"
-          const user = urlParams.get('user'); // Получит "admin"
+    function openMinusModal(containerId, productIdx, event) {
+      event.stopPropagation();
+      activeContainerId = containerId;
+      activeProductIdx = productIdx;
+      
+      const maxVal = containersData[containerId][productIdx];
+      const prodName = PRODUCT_NAMES[productIdx];
 
-          if (data) 
-          {
-          document.getElementById('display').innerText = "Получено значение: " + data;
-          console.log("Данные от бота:", data);
-          }};
-         </script>
+      document.getElementById('modalTitle').textContent = `Контейнер #${containerId} • ${prodName}`;
+      document.getElementById('modalSubtitle').textContent = `Доступно для списания: ${maxVal} кг`;
+      
+      const input = document.getElementById('amountInput');
+      input.value = '';
+      input.max = maxVal;
+      input.placeholder = `Макс. ${maxVal}`;
 
-</div>
+      selectWorkshop(1);
+      document.getElementById('modalBackdrop').classList.add('active');
+      setTimeout(() => input.focus(), 100);
+    }
+
+    function closeModal(event = null, force = false) {
+      if (force || event.target === document.getElementById('modalBackdrop')) {
+        document.getElementById('modalBackdrop').classList.remove('active');
+        document.activeElement.blur();
+      }
+    }
+
+    function selectWorkshop(num) {
+      selectedWorkshop = num;
+      document.querySelectorAll('.workshop-btn').forEach(btn => btn.classList.remove('active'));
+      document.getElementById(`ws${num}`).classList.add('active');
+      document.getElementById('wsSelectedLabel').textContent = num;
+    }
+
+    function validateInput() {
+      const input = document.getElementById('amountInput');
+      const maxVal = containersData[activeContainerId][activeProductIdx];
+      let val = parseFloat(input.value);
+
+      if (val > maxVal) {
+        input.value = maxVal;
+      }
+    }
+
+    function confirmTransfer() {
+      const input = document.getElementById('amountInput');
+      const amount = parseFloat(input.value);
+      const maxVal = containersData[activeContainerId][activeProductIdx];
+
+      if (isNaN(amount) || amount <= 0) {
+        if (tg) tg.showAlert("Укажите корректный вес больше 0!");
+        else alert("Укажите корректный вес больше 0!");
+        return;
+      }
+
+      // Вычитаем остаток
+      containersData[activeContainerId][activeProductIdx] = parseFloat((maxVal - amount).toFixed(3));
+
+      // Фиксируем операцию в массив
+      operationsData.push({
+        step: operationsData.length + 1,
+        product: PRODUCT_NAMES[activeProductIdx],
+        container: `cont${activeContainerId}`,
+        weight: amount,
+        workshop: selectedWorkshop
+      });
+
+      if (tg) {
+        tg.HapticFeedback.notificationOccurred('success');
+      }
+
+      closeModal(null, true);
+      renderContainers();
+    }
+
+    // Отправка данных в Telegram бот (C#-совместимый JSON)
+    function sendDataToBot() {
+      // Формируем URL с новыми остатками
+      const params = new URLSearchParams();
+      for (let i = 1; i <= 20; i++) {
+        params.set(`cont${i}`, containersData[i].join(','));
+      }
+      const updatedUrl = `${window.location.origin}${window.location.pathname}?${params.toString()}`;
+
+      const totalSubtracted = operationsData.reduce((sum, o) => sum + o.weight, 0);
+
+      // Итоговая структура JSON
+      const resultJson = {
+        operations: operationsData,
+        totalSubtracted: totalSubtracted,
+        updatedUrl: updatedUrl,
+        containers: containersData
+      };
+
+      if (tg) {
+        tg.sendData(JSON.stringify(resultJson));
+        tg.close();
+      } else {
+        console.log("Result JSON:", resultJson);
+        alert(`Данные готовы для отправки в бот!\nСписаний: ${operationsData.length}\nВсего списано: ${totalSubtracted} кг`);
+      }
+    }
+
+    loadUrlData();
+    renderContainers();
+  </script>
 </body>
 </html>
