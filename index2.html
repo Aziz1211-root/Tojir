@@ -333,36 +333,56 @@
     </style>
 </head>
 <body>
-<div class="page-wrap">
-  <!-- Header -->
-  <div class="page-header">
-    <p class="eyebrow">Tojir Plast</p>
-    <h1>Для распределения товаров по цехам</h1>
-  </div>
-  <!-- /Header -->
-  <!-- form-card --> 
-  <div class="form-card">
-  <div class="row g-3 mb-4">
-    <!-- ── Section 2: Select & Textarea ── -->
-    <p class="form-section-title">Выбор &amp; Цех <span class="badge-pill">Всегда выберете Цех</span></p>
-    <!-- ── /Section 2: Select & Textarea ── -->
-    <!-- Select — label is always in floated position -->
+    <div class="page-wrap">
+        <!-- Header -->
+        <div class="page-header">
+            <p class="eyebrow">Tojir Plast</p>
+            <h1>Для распределения товаров по цехам</h1>
+        </div>
+        <!-- /Header -->
+        <!-- form-card -->
+        <div class="form-card">
+            <div class="row g-3 mb-4">
+                <!-- ── Section 2: Select & Textarea ── -->
+                <p class="form-section-title">Выбор &amp; Цех <span class="badge-pill">Всегда выберете Цех</span></p>
+                <!-- ── /Section 2: Select & Textarea ── -->
+                <!-- Select — label is always in floated position -->
+                <!-- /Select — label is always in floated position -->
+            </div>
+
+
+            <h6 class="text-secondary fw-bold mb-2">Операции списания:</h6>
+
+            <!-- Список динамических блоков списания -->
+            <div id="operationsList"></div>
+
+            <div class="divider"></div>
+            <!-- ── Actions ── -->
+            <button class="btn btn-primary" id="sendDataBtn" disabled>ОК</button>
+        </div>
+        <!-- /form-card -->
+        <script>
+          // Инициализируем Telegram WebApp
+          const tg = window.Telegram.WebApp;
+          tg.ready();
+          tg.expand();
+         </script>
+         <script>
+          // Ждем загрузки страницы
+          window.onload = () => {
+          // Получаем параметры из URL
+          const urlParams = new URLSearchParams(window.location.search);
     
-  <!-- /Select — label is always in floated position -->
-  </div>
-    
+          const data = urlParams.get('data'); // Получит "12345"
+          const user = urlParams.get('user'); // Получит "admin"
 
-    <h6 class="text-secondary fw-bold mb-2">Операции списания:</h6>
+          if (data) 
+          {
+          document.getElementById('display').innerText = "Получено значение: " + data;
+          console.log("Данные от бота:", data);
+          }};
+         </script>
 
-    <!-- Список динамических блоков списания -->
-    <div id="operationsList"></div>
-
-    <div class="divider"></div>
-    <!-- ── Actions ── -->
-    <button class="btn btn-primary" id="sendDataBtn" disabled>Списать полностью в 0 кг</button>
-  </div>
-  <!-- /form-card -->
- 
 </div>
 </body>
 </html>
