@@ -363,7 +363,7 @@
       <div class="field-group">
         <label class="field-label">Укажите вес для списания (кг):</label>
         <div class="input-wrapper">
-          <input type="number" id="amountInput" class="num-input" placeholder="0" min="0" step="1" oninput="validateInput()" inputmode="numeric"  oninput="this.value = this.value.replace(/[^0-9]/g, '');">
+          <input type="number" id="amountInput" class="num-input" placeholder="0" min="0" step="1" oninput="validateInput()" inputmode="numeric" >
           <span class="input-suffix">кг</span>
         </div>
       </div>
@@ -521,14 +521,29 @@
     }
 
     function validateInput() {
-      const input = document.getElementById('amountInput');
-      const maxVal = containersData[activeContainerId][activeProductIdx];
-      let val = parseFloat(input.value);
+  const input = document.getElementById('amountInput');
+  const maxVal = parseInt(containersData[activeContainerId][activeProductIdx], 10) || 0;
 
-      if (val > maxVal) {
-        input.value = maxVal;
-      }
-    }
+  // 1. Оставляем только цифры (удаляем точки, запятые, знаки минуса и буквы)
+  input.value = input.value.replace(/[^0-9]/g, '');
+
+  // Если поле очистили (пустое) — ничего не делаем, даём пользователю ввести число
+  if (input.value === '') {
+    return;
+  }
+
+  // 2. Преобразуем строго в целое число (в десятичной системе)
+  let val = parseInt(input.value, 10);
+
+  // 3. Проверка на превышение максимального остатка
+  if (val > maxVal) {
+    val = maxVal;
+  }
+
+  // 4. Записываем итоговое целое число обратно в поле
+  input.value = val;
+}
+
 
     function confirmTransfer() {
       const input = document.getElementById('amountInput');
