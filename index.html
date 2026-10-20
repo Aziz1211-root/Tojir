@@ -375,7 +375,7 @@
   </div>
     <!-- Исходный вес партии -->
     <div class="form-floating mb-3">
-      <input type="number" step="0.01" min="1" class="form-control fw-bold fs-5" id="baseWeight" value="1000" placeholder="1000">
+      <input type="number" step="0.01" min="1" class="form-control fw-bold fs-5" id="baseWeight" value="1000" placeholder="1000" inputmode="numeric"  oninput="this.value = this.value.replace(/[^0-9]/g, '');">
       <label for="baseWeight">Общий исходный вес (кг)</label>
     </div>
 
@@ -476,7 +476,7 @@
             <!-- 3. Вес для списания -->
             <div class="col-12">
               <div class="form-floating">
-                <input type="number" step="0.01" min="0" class="form-control op-weight" placeholder="0.00">
+                <input type="number" step="1" min="0" class="form-control op-weight" placeholder="0" inputmode="numeric"  oninput="this.value = this.value.replace(/[^0-9]/g, '');">
                 <label>Списать вес (кг)</label>
               </div>
             </div>
